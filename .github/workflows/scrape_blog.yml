@@ -1,0 +1,40 @@
+name: Scrape and Upload Blog
+
+# This workflow runs on a schedule (daily at midnight)
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Every day at midnight
+
+jobs:
+  scrape_and_upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 PyGithub
+
+      # Step 4: Run the blog scraper script
+      - name: Run the blog scraper
+        run: python scrape_blog.py
+
+      # Step 5: Push changes back to the repository
+      - name: Push changes
+        run: |
+          git config --global user.email "editor@pyrrhicpress.org"
+          git config --global user.name "Dr. Nicholas J. Pirro"
+          git add .
+          git commit -m "Updated blog articles"
+          git push origin PyrrhicPress-Articles
